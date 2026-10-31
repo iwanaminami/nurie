@@ -40,7 +40,7 @@ def db():
 
 def jbody(h):
     n = int(h.headers.get("Content-Length") or 0)
-    if n > 200_000: raise ValueError("too large")
+    if n < 0 or n > 200_000: raise ValueError("bad length")
     return json.loads(h.rfile.read(n) or b"{}")
 
 
@@ -473,16 +473,23 @@ def _rate_record(ip):
 
 
 class H(BaseHTTPRequestHandler):
+    timeout = 10
     def log_message(self, *a): pass
+    def _sec(self):
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("Referrer-Policy", "no-referrer")
     def send_json(self, code, obj):
         body = json.dumps(obj, ensure_ascii=False).encode()
         self.send_response(code)
+        self._sec()
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers(); self.wfile.write(body)
     def send_html(self, code, html):
         body = html.encode()
         self.send_response(code)
+        self._sec()
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers(); self.wfile.write(body)
@@ -490,6 +497,7 @@ class H(BaseHTTPRequestHandler):
     def send_csv(self, eid, text):
         body = text.encode("utf-8")
         self.send_response(200)
+        self._sec()
         self.send_header("Content-Type", "text/csv; charset=utf-8")
         self.send_header("Content-Disposition", 'attachment; filename="nurie-%s.csv"' % eid)
         self.send_header("Content-Length", str(len(body)))
@@ -505,7 +513,7 @@ class H(BaseHTTPRequestHandler):
             fname = p.path.lstrip("/")
             try:
                 data = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), fname), "rb").read()
-                self.send_response(200); self.send_header("Content-Type", "image/png")
+                self.send_response(200); self._sec(); self.send_header("Content-Type", "image/png")
                 self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data); return
             except OSError: return self.send_html(404, NOT_FOUND_PAGE)
         m = re.fullmatch(r"/e/([A-Za-z0-9_-]{8,32})", p.path)
@@ -587,6 +595,13 @@ class H(BaseHTTPRequestHandler):
             evrow = con.execute("SELECT allowed,dates,kind FROM events WHERE id=?", (m.group(1),)).fetchone()
             if not evrow:
                 return self.send_json(404, {"error": "not found"})
+            prev0 = str(body.get("prevName", "")).strip()[:30]
+            name_exists = con.execute("SELECT 1 FROM paints WHERE event_id=? AND name=?", (m.group(1), name)).fetchone()
+            is_rename = bool(prev0 and prev0 != name and con.execute("SELECT 1 FROM paints WHERE event_id=? AND name=?", (m.group(1), prev0)).fetchone())
+            if not name_exists and not is_rename:
+                cnt = con.execute("SELECT COUNT(*) FROM paints WHERE event_id=?", (m.group(1),)).fetchone()[0]
+                if cnt >= 100:
+                    return self.send_json(403, {"error": "参加者の上限（100人）に達しています"})
             allowed_set = set(json.loads(evrow[0])) if evrow[0] else None
             date_set = set(json.loads(evrow[1]))
             ev_kind = evrow[2] or "time"
@@ -619,7 +634,7 @@ class H(BaseHTTPRequestHandler):
         if m:
             con = db()
             row = con.execute("SELECT admin_key FROM events WHERE id=?", (m.group(1),)).fetchone()
-            if not row or body.get("adminKey") != row[0]:
+            if not row or not hmac.compare_digest(str(body.get("adminKey", "")), row[0]):
                 return self.send_json(403, {"error": "forbidden"})
             con.execute("DELETE FROM events WHERE id=?", (m.group(1),))
             con.execute("DELETE FROM paints WHERE event_id=?", (m.group(1),))
