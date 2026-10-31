@@ -1,0 +1,20 @@
+services:
+  nurie:
+    build: .
+    image: nurie-scheduler
+    ports:
+      - "8378:8378"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+  # Cloudflare Tunnel で公開する場合だけ使う（--profile tunnel）
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - nurie
+    restart: unless-stopped
+    profiles:
+      - tunnel

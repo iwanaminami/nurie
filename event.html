@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nurie｜塗るだけ日程調整</title>
+<meta name="description" content="ドラッグで塗るだけの日程調整。候補日と空き時間を塗ると、みんなの空きが一目で分かります。登録不要・無料。">
+<meta name="theme-color" content="#c8102e">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27%23c8102e%27%2F%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2714%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%277%27%2F%3E%3C%2Fsvg%3E">
+<meta property="og:site_name" content="nurie">
+<meta property="og:title" content="nurie｜塗るだけ日程調整">
+<meta property="og:description" content="ドラッグで塗るだけの日程調整。候補日と空き時間を塗ると、みんなの空きが一目で分かります。登録不要・無料。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nurie.noweb.page/">
+<meta property="og:image" content="https://nurie.noweb.page/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://nurie.noweb.page/ogp.png">
+<meta name="twitter:title" content="nurie｜塗るだけ日程調整">
+<meta name="twitter:description" content="ドラッグで塗るだけの日程調整。候補日と空き時間を塗ると、みんなの空きが一目で分かります。登録不要・無料。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body{font-family:"Google Sans","Noto Sans JP",system-ui,-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;margin:16px auto;padding:0 12px;max-width:1060px;color:#1e293b;background:#f6f8fc;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  h1{text-align:center}
+  body>p{text-align:center}
+  h1{font-size:19px;margin:0 0 4px;letter-spacing:.02em}
+  p{font-size:13px;color:#64748b;line-height:1.6}
+  .bar{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0;align-items:flex-end;justify-content:center;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:10px 14px;box-shadow:0 1px 3px rgba(30,41,59,.06),0 8px 24px rgba(30,41,59,.05)}
+  .group{display:flex;flex-direction:column;gap:5px}
+  .group .glabel{font-size:10.5px;color:#94a3b8;letter-spacing:.08em;font-weight:600}
+  .seg{display:flex;background:#eef2f7;border-radius:10px;padding:3px;gap:2px;height:34px;box-sizing:border-box;align-items:stretch}
+  .seg button{border:none;background:transparent;padding:0 12px;height:100%;border-radius:8px;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center}
+  .seg button.on{background:#c8102e;color:#fff;box-shadow:0 1px 4px rgba(200,16,46,.35)}
+  .seg button.on.tri{background:#fbd9dd;color:#a50d26;box-shadow:0 1px 4px rgba(200,16,46,.18)}
+  .seg button.on.xb{background:#e8ebef;color:#1e293b;box-shadow:0 1px 4px rgba(30,41,59,.15)}
+  button{padding:0 12px;height:34px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+  button.on{background:#c8102e;color:#fff;border-color:#c8102e}
+  #clearBtn{color:#b91c1c;border-color:#fecaca;background:#fff7f7}
+  #delBtn{color:#b91c1c;border-color:#fecaca;background:#fff7f7}
+  input,select{padding:0 8px;height:34px;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:inherit;font-size:13.5px}
+  .scrollOuter{position:relative}
+  .wrap{overflow-x:auto;overflow-y:hidden;border:1px solid #ddd;border-radius:10px;background:#fff}
+  .fadeR{position:absolute;top:0;right:0;bottom:0;width:44px;pointer-events:none;
+    background:linear-gradient(to right,rgba(255,255,255,0),rgba(200,120,130,.30));transition:opacity .25s}
+  .fadeL{position:absolute;top:0;bottom:0;width:44px;pointer-events:none;left:66px;
+    background:linear-gradient(to left,rgba(255,255,255,0),rgba(200,120,130,.30));transition:opacity .25s;opacity:0}
+  .scrollHint{position:absolute;right:10px;bottom:10px;background:rgba(30,41,59,.85);color:#fff;font-size:11px;
+    padding:4px 10px;border-radius:999px;pointer-events:none;transition:opacity .4s}
+  table{border-collapse:collapse;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+  #grid{table-layout:fixed;width:max-content}
+  th,td{border:1px solid #e3e3e3;text-align:center;font-size:11px;padding:0;box-sizing:border-box}
+  th.day{width:66px;min-width:66px;white-space:nowrap;background:#f7f7f7}
+  #grid th.day{position:sticky;left:0;z-index:2;height:30px;padding:0 4px}
+  #grid th.corner{position:sticky;left:0;z-index:3;background:#f7f7f7;width:66px;min-width:66px}
+  th.time{padding:4px 0;width:26px;min-width:26px;height:24px;font-weight:normal;position:relative;overflow:visible}
+  th.time .tick{position:absolute;left:0;top:4px;transform:translateX(-50%);font-size:11px;white-space:nowrap;z-index:5}
+  td.cell{width:26px;min-width:26px;height:30px;cursor:cell;background:#fff;touch-action:none}
+  body.scrollmode td.cell{touch-action:auto;cursor:grab}
+  body.grabbing, body.grabbing *{cursor:grabbing !important}
+  td.cell.mine{background:#c8102e;color:#fff;font-weight:bold;font-size:13px}
+  td.cell.maybe{background:#fbd9dd;color:#a50d26;font-weight:bold;font-size:13px}
+  td.cell.ng{color:#d8d8d8;font-size:12px}
+  td.cell.def{color:#d8d8d8;font-size:12px}
+  td.cell.hourL{border-left:2px solid #d9b3ba}
+  td.cell.h0{background:#fff} td.cell.h1{background:#fde8ea} td.cell.h2{background:#f3a7b1}
+  td.cell.h3{background:#d92b42} td.cell.h4{background:#a50d26}
+  td.cell.h3,td.cell.h4{color:#fff}
+  td.cell .tri{font-size:8px;color:#b45309;vertical-align:super}
+  td.cell.off{background:#eef1f5;cursor:not-allowed}
+
+  table.listTable{table-layout:fixed;width:max-content;border-collapse:collapse;user-select:none}
+  table.listTable th,table.listTable td{border:1px solid #e3e3e3;text-align:center;font-size:11px;padding:0;box-sizing:border-box}
+  table.listTable th.time{padding:4px 0;width:26px;min-width:26px;height:24px;font-weight:normal;position:relative;overflow:visible}
+  table.listTable th.time .tick{position:absolute;left:0;top:4px;transform:translateX(-50%);font-size:11px;white-space:nowrap;z-index:5}
+  table.listTable th.nameH{width:74px;min-width:74px;background:#fff;position:sticky;left:0;z-index:3}
+  table.listTable td.name{width:74px;min-width:74px;background:#f7f7f7;position:sticky;left:0;z-index:2;height:30px;padding:0 6px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;overflow:hidden;text-overflow:ellipsis}
+  table.listTable td.sym{width:26px;min-width:26px;height:30px;font-size:13px;background:#fff}
+  table.listTable td.sym.o{color:#a50d26;font-weight:bold}
+  table.listTable td.sym.t{color:#b45309;font-weight:bold}
+  table.listTable td.sym.x{color:#d8d8d8;font-size:12px}
+  table.listTable td.sym.hourL{border-left:2px solid #d9b3ba}
+  .listWrap{overflow-x:auto;border:1px solid #ddd;border-radius:10px;background:#fff;margin-bottom:6px}
+  @media (prefers-color-scheme: dark){
+    table.listTable th,table.listTable td{border-color:#262c38}
+    table.listTable td.name{background:#1d2129} table.listTable th.nameH{background:#15181e}
+    table.listTable td.sym{background:#15181e}
+    table.listTable td.sym.x{color:#4a505c}
+    .listWrap{border-color:#333a48;background:#15181e}
+  }
+
+  table.listTable td.sum{width:26px;min-width:26px;height:30px;font-size:12.5px;font-weight:bold;color:#a50d26;background:#fff}
+  table.listTable td.sumName{width:74px;min-width:74px;background:#f7f7f7;position:sticky;left:0;z-index:2;height:30px;padding:0 6px;font-size:12px;font-weight:600;white-space:nowrap}
+  @media (prefers-color-scheme: dark){ table.listTable td.sumName{background:#1d2129} table.listTable td.sum{background:#15181e} }
+
+  table.listTable td.sym.o{background:#f3a7b1}
+  table.listTable td.sym.t{background:#fde8e9}
+  @media (prefers-color-scheme: dark){
+    table.listTable td.sym.o{background:#7c1626}
+    table.listTable td.sym.t{background:#5c1a24}
+  }
+  body[data-theme="dark"] table.listTable td.sym.o{background:#7c1626}
+  body[data-theme="dark"] table.listTable td.sym.t{background:#5c1a24}
+  body[data-theme="light"] table.listTable td.sym.o{background:#f3a7b1}
+  body[data-theme="light"] table.listTable td.sym.t{background:#fde8e9}
+
+  .msym{font-size:16.5px;font-weight:700;vertical-align:-2px;margin-right:3px}
+  .seg button{white-space:nowrap}
+  @media (max-width:600px){
+    .seg button{font-size:12px;padding:0 7px}
+    .msym{font-size:14.5px;margin-right:2px}
+    .bar{gap:6px;padding:8px}
+  }
+
+  .ic{width:15px;height:15px;vertical-align:-2.5px;margin-right:3px;flex:none}
+  .cell-ic{width:15px;height:15px;vertical-align:-3px;margin:0}
+  .sum-ic{width:13px;height:13px;vertical-align:-2px;margin-right:2px}
+
+  table.listTable td.sym.o{background:#c8102e;color:#fff}
+  table.listTable td.sym.t{background:#fbd9dd;color:#a50d26}
+  @media (prefers-color-scheme: dark){
+    table.listTable td.sym.o{background:#c8102e;color:#fff}
+    table.listTable td.sym.t{background:#5c1a24;color:#f6c3cb}
+  }
+  body[data-theme="dark"] table.listTable td.sym.o{background:#c8102e;color:#fff}
+  body[data-theme="dark"] table.listTable td.sym.t{background:#5c1a24;color:#f6c3cb}
+  body[data-theme="light"] table.listTable td.sym.o{background:#c8102e;color:#fff}
+  body[data-theme="light"] table.listTable td.sym.t{background:#fbd9dd;color:#a50d26}
+
+  table.dcal{border-collapse:collapse;margin:0 auto 14px;user-select:none;-webkit-user-select:none;touch-action:none}
+  table.dcal th,table.dcal td{width:44px;height:46px;border:1px solid #e3e3e3;text-align:center;background:#fff;position:relative;padding:0;box-sizing:border-box}
+  table.dcal th{height:26px;font-size:11.5px;background:#f7f7f7}
+  table.dcal td.na{color:#c3cad4;background:#fafbfc}
+  table.dcal td.dim{background:#fafbfc}
+  table.dcal td.dcell{cursor:pointer}
+  .dnum{font-size:15px;font-weight:700;display:block;line-height:1.15;margin-top:3px}
+  table.dcal td.dcell .dnum{position:absolute;top:2px;left:0;right:0;font-size:11.5px;margin:0}
+  .dmark{position:absolute;left:50%;top:59%;transform:translate(-50%,-50%);line-height:0}
+  .dmark svg{width:20px;height:20px;display:block}
+  table.dcal td.dcell.o{background:#c8102e;color:#fff}
+  table.dcal td.dcell.t{background:#fbd9dd;color:#a50d26}
+  .calMonthTitle{text-align:center;font-weight:700;font-size:14.5px;margin:16px 0 6px}
+  table.listTable th.dateH{width:40px;min-width:40px;height:36px;background:#f7f7f7;font-size:11.5px;font-weight:600}
+  @media (prefers-color-scheme: dark){
+    table.dcal th,table.dcal td{border-color:#262c38;background:#15181e}
+    table.dcal th{background:#1d2129}
+    table.dcal td.na{background:#101216;color:#454c58}
+    table.dcal td.dim{background:#101216}
+    table.dcal td.dcell.t{background:#5c1a24;color:#f6c3cb}
+    table.listTable th.dateH{background:#1d2129}
+  }
+  body[data-theme="dark"] table.dcal th,body[data-theme="dark"] table.dcal td{border-color:#262c38;background:#15181e}
+  body[data-theme="dark"] table.dcal th{background:#1d2129}
+  body[data-theme="dark"] table.dcal td.na{background:#101216;color:#454c58}
+  body[data-theme="dark"] table.dcal td.dim{background:#101216}
+  body[data-theme="dark"] table.dcal td.dcell.t{background:#5c1a24;color:#f6c3cb}
+  body[data-theme="dark"] table.listTable th.dateH{background:#1d2129}
+  body[data-theme="light"] table.dcal th,body[data-theme="light"] table.dcal td{border-color:#e3e3e3;background:#fff}
+  body[data-theme="light"] table.dcal th{background:#f7f7f7}
+  body[data-theme="light"] table.dcal td.na{background:#fafbfc;color:#c3cad4}
+  body[data-theme="light"] table.dcal td.dim{background:#fafbfc;border-color:#e3e3e3}
+  body[data-theme="light"] table.dcal td.dcell.t{background:#fbd9dd;color:#a50d26}
+  body[data-theme="light"] table.listTable th.dateH{background:#f7f7f7}
+  .listOuter{position:relative;margin-bottom:6px}
+  .listOuter .listWrap{margin-bottom:0;box-shadow:0 1px 3px rgba(30,41,59,.08),0 6px 18px rgba(30,41,59,.06)}
+  .listFade{position:absolute;top:1px;bottom:1px;width:44px;pointer-events:none;opacity:0;transition:opacity .25s;z-index:5}
+  .listFade.r{right:1px;background:linear-gradient(to left,rgba(200,16,46,.28),rgba(200,16,46,0))}
+  .listFade.l{left:75px;background:linear-gradient(to right,rgba(200,16,46,.28),rgba(200,16,46,0))}
+  button.danger{color:#b91c1c;border-color:#fecaca;background:#fff7f7}
+  @media (prefers-color-scheme: dark){ button.danger{background:#2a1d1d;border-color:#5b2b2b;color:#f3a3a3} }
+  body[data-theme="dark"] button.danger{background:#2a1d1d;border-color:#5b2b2b;color:#f3a3a3}
+  body[data-theme="light"] button.danger{background:#fff7f7;border-color:#fecaca;color:#b91c1c}
+  .pdel{width:22px;height:22px;padding:0;border-radius:50%;font-size:13px;line-height:1;flex:none}
+  .nameCellIn{display:flex;align-items:center;gap:4px}
+  .nameTxt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .legend{font-size:12px;color:#64748b}
+  #saveState{font-size:12px;color:#16a34a}
+  .plist{font-size:12.5px;color:#475569}
+  @media (prefers-color-scheme: dark){
+    body{background:#101216;color:#e8eaee}
+    p{color:#a7adb8}
+    .bar{background:#171b22;border-color:#2b3242;box-shadow:none}
+    .seg{background:#232833}
+    .seg button{color:#c6ccd8}
+    .seg button.on.xb{background:#39404d;color:#e8eaee}
+    button{background:#1d2129;color:#e8eaee;border-color:#3a4152}
+    button.on{background:#c8102e;border-color:#c8102e;color:#fff}
+    #clearBtn,#delBtn{background:#2a1d1d;border-color:#5b2b2b;color:#f3a3a3}
+    input,select{background:#1d2129;color:#e8eaee;border-color:#3a4152}
+    .wrap{border-color:#333a48;background:#15181e}
+    th,td{border-color:#262c38}
+    th.day{background:#1d2129}
+    #grid th.corner{background:#1d2129}
+    td.cell{background:#15181e}
+    td.cell.hourL{border-left-color:#6e4650}
+    td.cell.maybe{background:#5c1a24;color:#f6c3cb}
+    td.cell.off{background:#14161a}
+    td.cell.ng,td.cell.def{color:#4a505c}
+    td.cell.h1{background:#3d1219} td.cell.h2{background:#7c1626}
+    .fadeR{background:linear-gradient(to right,rgba(16,18,22,0),rgba(200,100,115,.35))}
+    .fadeL{background:linear-gradient(to left,rgba(16,18,22,0),rgba(200,100,115,.35))}
+    .legend,.plist{color:#8b929e}
+  }
+  /* 手動テーマ切替（data-theme） */
+body[data-theme="dark"] table.listTable th{border-color:#262c38}
+body[data-theme="dark"] table.listTable td{border-color:#262c38}
+body[data-theme="dark"] table.listTable th.nameH{background:#15181e}
+body[data-theme="dark"] table.listTable td.name{background:#1d2129}
+body[data-theme="dark"] table.listTable td.sym{background:#15181e}
+body[data-theme="dark"] table.listTable td.sym.x{color:#4a505c}
+body[data-theme="dark"] .listWrap{border-color:#333a48;background:#15181e}
+body[data-theme="dark"] table.listTable td.sumName{background:#1d2129}
+body[data-theme="dark"] table.listTable td.sum{background:#15181e}
+body[data-theme="dark"]{background:#101216;color:#e8eaee}
+body[data-theme="dark"] p{color:#a7adb8}
+body[data-theme="dark"] .bar{background:#171b22;border-color:#2b3242;box-shadow:none}
+body[data-theme="dark"] .seg{background:#232833}
+body[data-theme="dark"] .seg button{color:#c6ccd8}
+body[data-theme="dark"] .seg button.on.xb{background:#39404d;color:#e8eaee}
+body[data-theme="dark"] button{background:#1d2129;color:#e8eaee;border-color:#3a4152}
+body[data-theme="dark"] button.on{background:#c8102e;border-color:#c8102e;color:#fff}
+body[data-theme="dark"] #clearBtn{background:#2a1d1d;border-color:#5b2b2b;color:#f3a3a3}
+body[data-theme="dark"] #delBtn{background:#2a1d1d;border-color:#5b2b2b;color:#f3a3a3}
+body[data-theme="dark"] input{background:#1d2129;color:#e8eaee;border-color:#3a4152}
+body[data-theme="dark"] select{background:#1d2129;color:#e8eaee;border-color:#3a4152}
+body[data-theme="dark"] .wrap{border-color:#333a48;background:#15181e}
+body[data-theme="dark"] th{border-color:#262c38}
+body[data-theme="dark"] td{border-color:#262c38}
+body[data-theme="dark"] th.day{background:#1d2129}
+body[data-theme="dark"] #grid th.corner{background:#1d2129}
+body[data-theme="dark"] td.cell{background:#15181e}
+body[data-theme="dark"] td.cell.hourL{border-left-color:#6e4650}
+body[data-theme="dark"] td.cell.maybe{background:#5c1a24;color:#f6c3cb}
+body[data-theme="dark"] td.cell.off{background:#14161a}
+body[data-theme="dark"] td.cell.ng{color:#4a505c}
+body[data-theme="dark"] td.cell.def{color:#4a505c}
+body[data-theme="dark"] td.cell.h1{background:#3d1219}
+body[data-theme="dark"] td.cell.h2{background:#7c1626}
+body[data-theme="dark"] .fadeR{background:linear-gradient(to right,rgba(16,18,22,0),rgba(200,100,115,.35))}
+body[data-theme="dark"] .fadeL{background:linear-gradient(to left,rgba(16,18,22,0),rgba(200,100,115,.35))}
+body[data-theme="dark"] .legend{color:#8b929e}
+body[data-theme="dark"] .plist{color:#8b929e}
+body[data-theme="light"] table.listTable th.nameH{background:#fff}
+body[data-theme="light"] table.listTable td.name{background:#f7f7f7}
+body[data-theme="light"] table.listTable td.sym{background:#fff}
+body[data-theme="light"] table.listTable td.sym.x{color:#d8d8d8}
+body[data-theme="light"] .listWrap{background:#fff}
+body[data-theme="light"] table.listTable td.sumName{background:#f7f7f7}
+body[data-theme="light"] table.listTable td.sum{background:#fff}
+body[data-theme="light"] p{color:#64748b}
+body[data-theme="light"] .bar{background:#fff;box-shadow:0 1px 3px rgba(30,41,59,.06),0 8px 24px rgba(30,41,59,.05)}
+body[data-theme="light"] .seg{background:#eef2f7}
+body[data-theme="light"] button{background:#fff}
+body[data-theme="light"] button.on{background:#c8102e;border-color:#c8102e;color:#fff}
+body[data-theme="light"] #clearBtn{background:#fff7f7;border-color:#fecaca;color:#b91c1c}
+body[data-theme="light"] #delBtn{background:#fff7f7;border-color:#fecaca;color:#b91c1c}
+body[data-theme="light"] .wrap{background:#fff}
+body[data-theme="light"] th.day{background:#f7f7f7}
+body[data-theme="light"] #grid th.corner{background:#f7f7f7}
+body[data-theme="light"] td.cell{background:#fff}
+body[data-theme="light"] td.cell.maybe{background:#fbd9dd;color:#a50d26}
+body[data-theme="light"] td.cell.off{background:#eef1f5}
+body[data-theme="light"] td.cell.ng{color:#d8d8d8}
+body[data-theme="light"] td.cell.def{color:#d8d8d8}
+body[data-theme="light"] td.cell.h1{background:#fde8ea}
+body[data-theme="light"] td.cell.h2{background:#f3a7b1}
+body[data-theme="light"] .fadeR{background:linear-gradient(to right,rgba(255,255,255,0),rgba(200,120,130,.30))}
+body[data-theme="light"] .fadeL{background:linear-gradient(to left,rgba(255,255,255,0),rgba(200,120,130,.30))}
+body[data-theme="light"] .legend{color:#64748b}
+body[data-theme="light"] .plist{color:#475569}
+
+
+  body[data-theme="light"]{background:#f6f8fc;color:#1e293b}
+  body[data-theme="light"] button{color:#1e293b}
+  body[data-theme="light"] button.on{color:#fff}
+  body[data-theme="light"] .seg button{color:#1e293b}
+  body[data-theme="light"] input,body[data-theme="light"] select{color:#1e293b;background:#fff;border-color:#cbd5e1}
+
+  body[data-theme="dark"] td.cell.mine{background:#c8102e;color:#fff}
+  body[data-theme="dark"] td.cell.maybe{background:#5c1a24;color:#f6c3cb}
+  body[data-theme="light"] td.cell.mine{background:#c8102e;color:#fff}
+  body[data-theme="light"] td.cell.maybe{background:#fbd9dd;color:#a50d26}
+  body[data-theme="light"] #saveBtn{color:#fff}
+  body[data-theme="light"] .bar{border-color:#e2e8f0}
+  body[data-theme="light"] .fadeR{background:linear-gradient(to right,rgba(246,248,252,0),rgba(200,16,46,.18))}
+  body[data-theme="light"] .fadeL{background:linear-gradient(to left,rgba(246,248,252,0),rgba(200,16,46,.18))}
+  body[data-theme="light"] .seg button.on{color:#fff}
+  body[data-theme="light"] .seg button.on.tri{color:#a50d26}
+  body[data-theme="light"] .seg button.on.xb{color:#1e293b}
+
+
+  body[data-theme="light"] th,body[data-theme="light"] td{border-color:#e3e3e3}
+  body[data-theme="light"] table.listTable th,body[data-theme="light"] table.listTable td{border-color:#e3e3e3}
+  body[data-theme="light"] .listWrap{border-color:#ddd}
+  body[data-theme="light"] .wrap{border-color:#ddd}
+  body[data-theme="light"] td.cell.hourL{border-left-color:#d9b3ba}
+  body[data-theme="light"] table.listTable td.sym.hourL{border-left-color:#d9b3ba}
+  body[data-theme="light"] td.cell{background:#fff}
+  body[data-theme="light"] td.cell.off{background:#f1f2f4}
+  body[data-theme="light"] th.day{background:#f7f7f7}
+  body[data-theme="light"] #grid th.corner{background:#f7f7f7}
+  /* 横スクロールバーは枠の下側の帯に出し、色をテーマに合わせる */
+  .scrollOuter{border:1px solid #ddd;border-radius:10px;background:#fff;overflow:hidden}
+  .wrap{border:none;border-radius:0}
+  .listOuter{border:1px solid #ddd;border-radius:10px;background:#fff;overflow:hidden}
+  .listWrap{border:none;border-radius:0;background:transparent}
+  .fadeR,.fadeL{bottom:16px}
+  .listFade{bottom:16px}
+  .wrap,.listWrap{padding-bottom:16px}
+  .wrap,.listWrap{scrollbar-width:thin;scrollbar-color:#dfa7b0 transparent}
+  .wrap::-webkit-scrollbar,.listWrap::-webkit-scrollbar{height:8px}
+  .wrap::-webkit-scrollbar-track,.listWrap::-webkit-scrollbar-track{background:transparent}
+  .wrap::-webkit-scrollbar-thumb,.listWrap::-webkit-scrollbar-thumb{background:#dfa7b0;border-radius:99px}
+  .wrap::-webkit-scrollbar-thumb:hover,.listWrap::-webkit-scrollbar-thumb:hover{background:#c8102e}
+  @media (prefers-color-scheme: dark){
+    .scrollOuter,.listOuter{border-color:#333a48;background:#15181e}
+    .wrap,.listWrap{scrollbar-color:#7a4a55 transparent}
+    .wrap::-webkit-scrollbar-thumb,.listWrap::-webkit-scrollbar-thumb{background:#7a4a55}
+  }
+  body[data-theme="dark"] .scrollOuter,body[data-theme="dark"] .listOuter{border-color:#333a48;background:#15181e}
+  body[data-theme="dark"] .wrap,body[data-theme="dark"] .listWrap{scrollbar-color:#7a4a55 transparent}
+  body[data-theme="dark"] .wrap::-webkit-scrollbar-thumb,body[data-theme="dark"] .listWrap::-webkit-scrollbar-thumb{background:#7a4a55}
+  body[data-theme="light"] .scrollOuter,body[data-theme="light"] .listOuter{border-color:#ddd;background:#fff}
+  body[data-theme="light"] .wrap,body[data-theme="light"] .listWrap{scrollbar-color:#dfa7b0 transparent}
+  body[data-theme="light"] .wrap::-webkit-scrollbar-thumb,body[data-theme="light"] .listWrap::-webkit-scrollbar-thumb{background:#dfa7b0}
+  #themeBtn{position:fixed;top:10px;right:12px;z-index:60;width:38px;height:38px;border-radius:50%;padding:0;font-size:17px;line-height:1;box-shadow:0 2px 8px rgba(30,41,59,.18)}
+</style>
+</head>
+<body>
+<div id="adminBanner" style="display:none;background:#1e293b;color:#fff;text-align:center;font-size:12.5px;font-weight:700;letter-spacing:.08em;padding:6px 0;margin:-14px -14px 12px">🔑 管理者モード</div>
+<button id="themeBtn" title="ダークモード切替">🌙</button>
+<style>.logoD{display:none}@media (prefers-color-scheme:dark){.logoL{display:none!important}.logoD{display:inline!important}}body[data-theme="dark"] .logoL{display:none!important}body[data-theme="dark"] .logoD{display:inline!important}body[data-theme="light"] .logoL{display:inline!important}body[data-theme="light"] .logoD{display:none!important}</style><div style="text-align:center;margin:0 0 10px"><a href="/" style="text-decoration:none;display:inline-block"><img class="logoL" src="/logo.png" alt="nurie" style="height:30px;vertical-align:middle"><img class="logoD" src="/logo-dark.png" alt="nurie" style="height:30px;vertical-align:middle;display:none"></a></div>
+<h1 id="title">読み込み中…</h1>
+<div id="editView" style="display:none">
+<div class="bar" style="margin-bottom:8px;align-items:center">
+  <span style="font-weight:700;font-size:14px;white-space:nowrap">参加者（あなたの名前）</span>
+  <label style="flex:1"><input id="name" value="" placeholder="名前" style="width:100%"></label>
+</div>
+<div class="bar" style="margin-bottom:8px;align-items:center">
+  <span style="font-weight:700;font-size:14px;white-space:nowrap">一言（任意）</span>
+  <label style="flex:1"><input id="note" value="" placeholder="例：13時以降なら確実です" maxlength="200" style="width:100%"></label>
+</div>
+<div class="bar">
+  <div class="group"><div class="seg">
+      <button id="modeO" class="on"><svg class="ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>空いてる</button>
+      <button id="modeTri"><svg class="ic" viewBox="0 0 20 20"><path d="M10 3.2 L17.8 16.8 H2.2 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg>空いてなくはない</button>
+      <button id="modeX"><svg class="ic" viewBox="0 0 20 20"><path d="M4.6 4.6 L15.4 15.4 M15.4 4.6 L4.6 15.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg>空いてない</button>
+    </div>
+  </div>
+  <div class="group"><div class="seg">
+      <button id="paintBtn" class="on">✏️ 塗る</button>
+      <button id="scrollBtn">✋ スクロール</button>
+    </div>
+  </div>
+  <div class="group" style="flex-basis:100%;align-items:center"><button id="clearBtn">自分の塗りをクリア</button></div>
+</div>
+<div class="scrollOuter" id="paintView"><div class="wrap" id="wrap"><table id="grid"></table></div><div class="fadeL" id="fadeL"></div><div class="fadeR" id="fadeR"></div></div>
+<div id="dateView" style="display:none"></div>
+</div><!-- /editView -->
+<div class="plist" id="plist"></div>
+<div id="listView"></div>
+<div id="editFoot" style="display:none;flex-direction:column;gap:10px;align-items:center;margin:16px 0 26px">
+  <button id="saveBtn" style="background:#c8102e;color:#fff;border-color:#c8102e;font-weight:bold;padding:0 26px">保存する</button>
+  <button id="backBtn">一覧に戻る</button>
+  <button id="deleteMineBtn" class="danger" style="display:none">この回答を削除する</button>
+  <button id="dotBtn" style="display:none">🎨 ドット絵で画像出力</button>
+  <span id="saveState"></span>
+</div>
+<div id="listFoot" style="display:flex;flex-direction:column;gap:10px;align-items:center;margin:16px 0 26px">
+  <button id="answerBtn" style="background:#c8102e;color:#fff;border-color:#c8102e;font-weight:bold;padding:0 26px">回答する</button>
+  <button id="shareBtn">この調整表を共有する</button>
+  <span id="shareMsg" style="font-size:12.5px;color:#16a34a"></span>
+  <button id="copyAdminBtn" style="display:none">管理ページのURLをコピー</button>
+  <span id="adminMsg" style="font-size:12.5px;color:#16a34a"></span>
+  <button id="csvBtn" style="display:none">回答をCSVでダウンロード</button>
+  <div id="expiresInfo" style="display:none;font-size:12.5px;color:#64748b;text-align:center"></div>
+  <button id="delBtn" style="display:none;margin-top:8px">この調整表を削除する</button>
+</div>
+<script>
+const SLOT=30;
+let slots=[]; for(let m=0;m<24*60;m+=SLOT) slots.push(m); // イベントの時間帯で読み込み時に作り直す
+let editingName=null; // 編集中の元の名前（改名判定用）
+const fmt=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const SVG_O='<svg class="ic cell-ic" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7" fill="none" stroke="currentColor" stroke-width="2.6"/></svg>';
+const SVG_T='<svg class="ic cell-ic" viewBox="0 0 20 20"><path d="M10 3.2 L17.8 16.8 H2.2 Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+const SVG_X='<svg class="ic cell-ic" viewBox="0 0 20 20"><path d="M4.6 4.6 L15.4 15.4 M15.4 4.6 L4.6 15.4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg>';
+const eventId=location.pathname.split('/').pop();
+const params=new URLSearchParams(location.search);
+const adminKey=params.get('admin');
+let isAdmin=false;
+let evKind='time';
+let days=[], others=new Map(), notes=new Map(), mine=new Map(), allowedSet=null, effAllowed=null, view='list'; // mine: "YYYY-MM-DD|slot" -> 1 | 0.5 | -1
+let mode=1, painting=null, dragging=false, scrollMode=false;
+const grid=document.getElementById('grid');
+const nameEl=document.getElementById('name'), noteEl=document.getElementById('note'), saveEl=document.getElementById('saveState');
+const dayLabel=ds=>{const d=new Date(ds+'T00:00:00'); return (d.getMonth()+1)+'/'+d.getDate()+'（'+'日月火水木金土'[d.getDay()]+'）';};
+const keyOf=(ds,si)=>ds+'|'+si;
+
+function scrollToEarliest(){
+  const ths=grid.querySelectorAll('th.time');
+  let idx=0;
+  if(effAllowed && effAllowed.size){ idx=Math.min(...[...effAllowed].map(k=>+k.split('|')[1])); }
+  const wrapEl=document.getElementById('wrap');
+  const target=Math.max(0, idx-1);
+  if(target>0 && ths[target]) wrapEl.scrollLeft=Math.max(0, ths[target].offsetLeft-66);
+  else wrapEl.scrollLeft=0;
+  updateFades();
+}
+async function load(){
+  const r=await fetch('/api/events/'+eventId);
+  if(!r.ok){ document.getElementById('title').textContent='調整表が見つかりません'; return; }
+  const j=await r.json();
+  document.getElementById('title').textContent=j.title;
+  document.title=j.title+' | nurie';
+  const ogt=document.querySelector('meta[property="og:title"]'); if(ogt) ogt.setAttribute('content', j.title+' | nurie');
+  const twt=document.querySelector('meta[name="twitter:title"]'); if(twt) twt.setAttribute('content', j.title+' | nurie');
+  days=j.dates;
+  evKind=j.kind||'time';
+  slots=[]; for(let m=0;m<24*60;m+=SLOT) slots.push(m); // 表示は常に 0:00-24:00
+  allowedSet=j.allowed? new Set(j.allowed) : null;
+  if(allowedSet) effAllowed=allowedSet;
+  else if((j.startMin??0)>0 || (j.endMin??1440)<1440){
+    effAllowed=new Set();
+    days.forEach(ds=>{ for(let m=(j.startMin??0);m<(j.endMin??1440);m+=SLOT) effAllowed.add(ds+'|'+(m/SLOT)); });
+  } else effAllowed=null;
+  others=new Map(j.participants.map(p=>[p.name,p.marks]));
+  notes=new Map(j.participants.map(p=>[p.name,p.note||'']));
+  if(j.expiresAt) window._expiresAt=j.expiresAt;
+  const saved=localStorage.getItem('nurie-name')||localStorage.getItem('tonton-name');
+  if(saved && others.has(saved)){ nameEl.value=saved; adopt(saved); }
+  else if(saved){ nameEl.value=saved; }
+  renderPlist();
+  buildGrid(); render();
+  requestAnimationFrame(()=>requestAnimationFrame(scrollToEarliest));
+  if(adminKey){
+    try{
+      const vr=await fetch('/api/events/'+eventId+'/verify-admin',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminKey})});
+      const vj=await vr.json();
+      if(vj.ok){ isAdmin=true; document.getElementById('adminBanner').style.display=''; document.getElementById('delBtn').style.display=''; document.getElementById('copyAdminBtn').style.display=''; document.getElementById('csvBtn').style.display='';
+        if(window._expiresAt){ const ei=document.getElementById('expiresInfo'); ei.textContent='保存期限：'+window._expiresAt+' に自動削除されます'; ei.style.display=''; ei.style.marginTop='26px'; } }
+    }catch(e){}
+  }
+  setView('list');
+}
+function renderPlist(){
+  const el=document.getElementById('plist');
+  el.innerHTML='';
+  const names=[...others.keys()];
+  if(!names.length){ el.textContent='参加者：まだいません'; return; }
+  const label=document.createElement('span'); label.textContent='参加者：'; el.appendChild(label);
+  names.forEach(n=>{
+    const b=document.createElement('button');
+    b.textContent=n;
+    b.style.cssText='height:26px;padding:0 10px;margin:0 3px;border-radius:999px;font-size:12.5px';
+    b.addEventListener('click',()=>startEdit(n));
+    el.appendChild(b);
+  });
+}
+function adopt(name){
+  mine=new Map(Object.entries(others.get(name)||{}));
+  noteEl.value=notes.get(name)||'';
+}
+nameEl.addEventListener('change',()=>{
+  const n=nameEl.value.trim();
+  localStorage.setItem('nurie-name',n);
+  if(mine.size===0 && others.has(n)) adopt(n); // 塗りが空のときだけ保存済みを読み込む（入力前の塗りを消さない）
+  render();
+});
+function markDirty(){ saveEl.textContent='未保存の変更があります'; saveEl.style.color='#d97706'; }
+async function save(){
+  const n=nameEl.value.trim();
+  if(!n){ saveEl.textContent='先に名前を入れてください'; saveEl.style.color='#dc2626'; return; }
+  if(others.has(n) && n!==editingName){ saveEl.textContent='その名前は既に使われています。編集する場合は一覧でその名前を押してください'; saveEl.style.color='#dc2626'; return; }
+  saveEl.textContent='保存中…'; saveEl.style.color='#94a3b8';
+  const marks={}; mine.forEach((v,k)=>{ marks[k]=v; });
+  const payload={name:n,marks,note:noteEl.value.trim().slice(0,200)}; if(editingName && editingName!==n) payload.prevName=editingName;
+  const r=await fetch('/api/events/'+eventId+'/paint',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  if(r.ok){
+    saveEl.textContent='保存しました'; saveEl.style.color='#16a34a';
+    if(editingName && editingName!==n){ others.delete(editingName); notes.delete(editingName); localStorage.setItem('nurie-name',n); }
+    others.set(n,marks); notes.set(n,payload.note);
+    renderPlist();
+    setView('list');
+  } else { saveEl.textContent='保存に失敗しました'; saveEl.style.color='#dc2626'; }
+}
+document.getElementById('saveBtn').addEventListener('click',save);
+function paintCell(td){
+  const key=keyOf(td.dataset.ds,+td.dataset.s);
+  if(effAllowed && !effAllowed.has(key)) return;
+  if(painting===null) painting=(mine.get(key)===mode)?'del':'set';
+  const before=mine.get(key);
+  if(painting==='set') mine.set(key,mode); else mine.delete(key);
+  if(mine.get(key)!==before){ renderCell(td); updateCount(); markDirty(); }
+}
+function renderCell(td){
+  const key=keyOf(td.dataset.ds,+td.dataset.s);
+  let cls='cell', html='';
+  if(effAllowed && !effAllowed.has(key)){ cls+=' off';
+    if(td.dataset.st!==cls+'|') { td.dataset.st=cls+'|'; td.className=cls; td.innerHTML=''; }
+    return; }
+  const v=mine.get(key);
+  if(v===1){ cls+=' mine'; html=SVG_O; }
+  else if(v===0.5){ cls+=' maybe'; html=SVG_T; }
+  else if(v===-1){ cls+=' ng'; html=SVG_X; }
+  else { cls+=' def'; html=SVG_X; }
+  if((+td.dataset.s*SLOT)%60===0) cls+=' hourL';
+  if(td.dataset.st===cls+'|'+html) return;
+  td.dataset.st=cls+'|'+html;
+  td.className=cls; td.innerHTML=html;
+}
+function updateCount(){}
+function render(){ grid.querySelectorAll('td.cell').forEach(renderCell); updateCount(); if(evKind==='date') renderDateCals(); }
+function buildGrid(){
+  grid.innerHTML='';
+  const hr=document.createElement('tr');
+  const corner=document.createElement('th'); corner.className='corner'; hr.appendChild(corner);
+  slots.forEach((m,idx)=>{ const th=document.createElement('th'); th.className='time';
+    if(m%60===0){ const sp=document.createElement('span'); sp.className='tick'; sp.textContent=fmt(m); th.appendChild(sp); }
+    if(idx===slots.length-1 && (m+SLOT)%60===0 && m+SLOT<24*60){
+      const sp2=document.createElement('span'); sp2.className='tick';
+      sp2.style.left='100%'; sp2.textContent=fmt(m+SLOT); th.appendChild(sp2);
+    }
+    hr.appendChild(th); });
+  grid.appendChild(hr);
+  days.forEach(ds=>{
+    const tr=document.createElement('tr');
+    const th=document.createElement('th'); th.className='day'; th.textContent=dayLabel(ds); tr.appendChild(th);
+    slots.forEach((m,si)=>{
+      const td=document.createElement('td'); td.className='cell'; td.dataset.ds=ds; td.dataset.s=m/SLOT;
+      td.addEventListener('pointerdown',e=>{ if(scrollMode) return; e.preventDefault(); dragging=true; painting=null; paintCell(td); });
+      tr.appendChild(td);
+    });
+    grid.appendChild(tr);
+  });
+}
+let moveQueued=false, lastX=0, lastY=0, prevX=null, prevY=null;
+document.addEventListener('pointerdown',e=>{ prevX=e.clientX; prevY=e.clientY; });
+document.addEventListener('pointermove',e=>{
+  if(!dragging) return;
+  lastX=e.clientX; lastY=e.clientY;
+  if(moveQueued) return; moveQueued=true;
+  requestAnimationFrame(()=>{
+    moveQueued=false; if(!dragging) return;
+    const dx=lastX-(prevX??lastX), dy=lastY-(prevY??lastY);
+    const steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/8));
+    for(let i=1;i<=steps;i++){
+      const x=(prevX??lastX)+dx*i/steps, y=(prevY??lastY)+dy*i/steps;
+      let el=document.elementFromPoint(x,y);
+      if(el&&!el.classList.contains('cell')) el=el.closest('.cell');
+      if(el) paintCell(el);
+    }
+    prevX=lastX; prevY=lastY;
+  });
+});
+function endDrag(){ painting=null; dragging=false; }
+document.addEventListener('pointerup',endDrag);
+document.addEventListener('pointercancel',endDrag);
+grid.addEventListener('contextmenu',e=>e.preventDefault());
+const modeO=document.getElementById('modeO'), modeTri=document.getElementById('modeTri'), modeX=document.getElementById('modeX');
+function setMode(v){ mode=v; modeO.classList.toggle('on',v===1); modeTri.classList.toggle('on',v===0.5); modeTri.classList.toggle('tri',v===0.5); modeX.classList.toggle('on',v===-1); modeX.classList.toggle('xb',v===-1); }
+modeO.addEventListener('click',()=>setMode(1));
+modeTri.addEventListener('click',()=>setMode(0.5));
+modeX.addEventListener('click',()=>setMode(-1));
+const scrollBtn=document.getElementById('scrollBtn'), paintBtn=document.getElementById('paintBtn');
+function setScrollMode(v){ scrollMode=v; document.body.classList.toggle('scrollmode',v); scrollBtn.classList.toggle('on',v); paintBtn.classList.toggle('on',!v); }
+scrollBtn.addEventListener('click',()=>setScrollMode(true));
+paintBtn.addEventListener('click',()=>setScrollMode(false));
+const wrap=document.getElementById('wrap');
+let sdrag=null;
+wrap.addEventListener('pointerdown',e=>{
+  if(!scrollMode||e.pointerType==='touch') return;
+  sdrag={x:e.clientX, sl:wrap.scrollLeft};
+  document.body.classList.add('grabbing');
+});
+document.addEventListener('pointermove',e=>{ if(sdrag) wrap.scrollLeft=sdrag.sl-(e.clientX-sdrag.x); });
+document.addEventListener('pointerup',()=>{ sdrag=null; document.body.classList.remove('grabbing'); });
+function setView(v){
+  view=v;
+  const isDate=(evKind==='date');
+  document.getElementById('editView').style.display=(v==='edit')?'':'none';
+  document.getElementById('editFoot').style.display=(v==='edit')?'flex':'none';
+  document.getElementById('listView').style.display=(v==='list')?'':'none';
+  document.getElementById('listFoot').style.display=(v==='list')?'flex':'none';
+  document.getElementById('plist').style.display=(v==='list')?'':'none';
+  document.getElementById('dateView').style.display=(v==='edit'&&isDate)?'':'none';
+  document.getElementById('paintView').style.display=(v==='edit'&&!isDate)?'':'none';
+  document.getElementById('scrollBtn').closest('.group').style.display=isDate?'none':'';
+  if(v==='list') renderList(); else { render();
+    if(isDate){ buildDateCals(); }
+    else requestAnimationFrame(()=>requestAnimationFrame(scrollToEarliest));
+  }
+}
+function startEdit(name){
+  editingName=name||null;
+  document.getElementById('deleteMineBtn').style.display=(name && others.has(name))?'':'none';
+  if(name){ nameEl.value=name; localStorage.setItem('nurie-name',name); adopt(name); }
+  setView('edit');
+}
+document.getElementById('answerBtn').addEventListener('click',()=>{
+  // 「回答する」は常に新しい回答として開始（自分の続き編集は一覧で自分の名前を押す）
+  editingName=null;
+  document.getElementById('deleteMineBtn').style.display='none';
+  nameEl.value=''; noteEl.value='';
+  mine=new Map();
+  render();
+  setView('edit');
+});
+document.getElementById('backBtn').addEventListener('click',()=>setView('list'));
+let dPainting=null, dDrag=false;
+function renderDateCell(td){
+  const v=mine.get(td.dataset.ds);
+  td.classList.toggle('o',v===1); td.classList.toggle('t',v===0.5);
+  const mk=td.querySelector('.dmark');
+  if(mk) mk.innerHTML=(v===1)?SVG_O:(v===0.5)?SVG_T:SVG_X;
+}
+function renderDateCals(){ document.querySelectorAll('#dateView td.dcell').forEach(renderDateCell); }
+function applyDateCell(td){
+  const ds=td.dataset.ds;
+  if(dPainting===null) dPainting=(mine.get(ds)===mode)?'del':'set';
+  const before=mine.get(ds);
+  if(dPainting==='set') mine.set(ds,mode); else mine.delete(ds);
+  if(mine.get(ds)!==before){ renderDateCell(td); markDirty(); }
+}
+function buildDateCals(){
+  const dv=document.getElementById('dateView'); dv.innerHTML='';
+  const months={}; days.forEach(ds=>{ const k=ds.slice(0,7); (months[k]=months[k]||[]).push(ds); });
+  Object.keys(months).sort().forEach(mk=>{
+    const parts=mk.split('-'); const y=+parts[0], mo=+parts[1];
+    const title=document.createElement('div'); title.className='calMonthTitle'; title.textContent=y+'年 '+mo+'月'; dv.appendChild(title);
+    const t=document.createElement('table'); t.className='dcal';
+    const hr=document.createElement('tr');
+    '日月火水木金土'.split('').forEach((w,i)=>{ const th=document.createElement('th'); th.textContent=w; if(i===0) th.style.color='#dc2626'; if(i===6) th.style.color='#2563eb'; hr.appendChild(th); });
+    t.appendChild(hr);
+    const first=new Date(y,mo-1,1), startDay=first.getDay(), dim=new Date(y,mo,0).getDate();
+    const cand=new Set(months[mk]);
+    let dnum=1;
+    for(let r=0;r<6&&dnum<=dim;r++){
+      const tr=document.createElement('tr');
+      for(let c=0;c<7;c++){
+        const td=document.createElement('td');
+        if((r===0&&c<startDay)||dnum>dim){ td.className='dim'; tr.appendChild(td); continue; }
+        const ds=y+'-'+String(mo).padStart(2,'0')+'-'+String(dnum).padStart(2,'0');
+        if(!cand.has(ds)){ td.className='na'; td.innerHTML='<span class="dnum" style="font-weight:400">'+dnum+'</span>'; }
+        else{
+          td.className='dcell'; td.dataset.ds=ds;
+          td.innerHTML='<span class="dnum">'+dnum+'</span><span class="dmark"></span>';
+          td.addEventListener('pointerdown',e=>{ e.preventDefault(); dDrag=true; dPainting=null; applyDateCell(td); });
+          td.addEventListener('pointerenter',()=>{ if(dDrag) applyDateCell(td); });
+        }
+        dnum++; tr.appendChild(td);
+      }
+      t.appendChild(tr);
+    }
+    dv.appendChild(t);
+  });
+  renderDateCals();
+}
+document.addEventListener('pointerup',()=>{ dDrag=false; dPainting=null; });
+function renderDateListTables(lv, names){
+  const outer=document.createElement('div'); outer.className='listWrap';
+  const t=document.createElement('table'); t.className='listTable';
+  const hr=document.createElement('tr');
+  const th0=document.createElement('th'); th0.className='nameH'; hr.appendChild(th0);
+  days.forEach(ds=>{
+    const th=document.createElement('th'); th.className='dateH';
+    const d=new Date(ds+'T00:00:00');
+    th.innerHTML='<div>'+(d.getMonth()+1)+'/'+d.getDate()+'</div><div style="font-size:10px;color:#94a3b8">'+'日月火水木金土'[d.getDay()]+'</div>';
+    hr.appendChild(th);
+  });
+  t.appendChild(hr);
+  const counts=days.map(ds=>{ let c=0; names.forEach(n=>{ if((others.get(n)||{})[ds]===1) c++; }); return c; });
+  const maxC=Math.max(1,...counts);
+  names.forEach(n=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td'); td0.className='name'; td0.title='押すとこの回答を編集できます';
+    td0.addEventListener('click',()=>startEdit(n));
+    const inw=document.createElement('div'); inw.className='nameCellIn';
+    const nsp=document.createElement('span'); nsp.className='nameTxt'; nsp.textContent=n; inw.appendChild(nsp);
+    if(isAdmin){
+      const dbtn=document.createElement('button'); dbtn.className='danger pdel'; dbtn.textContent='×'; dbtn.title=n+' の回答を削除';
+      dbtn.addEventListener('click',async(e)=>{ e.stopPropagation(); await adminDeleteParticipant(n); });
+      inw.appendChild(dbtn);
+    }
+    td0.appendChild(inw); tr.appendChild(td0);
+    const marks=others.get(n)||{};
+    days.forEach(ds=>{
+      const v=marks[ds];
+      const td=document.createElement('td');
+      td.className='sym '+((v===1)?'o':(v===0.5)?'t':'x');
+      td.style.width='40px'; td.style.minWidth='40px';
+      td.innerHTML=(v===1)?SVG_O:(v===0.5)?SVG_T:SVG_X;
+      tr.appendChild(td);
+    });
+    t.appendChild(tr);
+  });
+  const trS=document.createElement('tr');
+  const tdS0=document.createElement('td'); tdS0.className='sumName'; tdS0.innerHTML=SVG_O.replace('cell-ic','sum-ic')+'の数'; trS.appendChild(tdS0);
+  days.forEach((ds,idx)=>{
+    const td=document.createElement('td'); td.className='sum'; td.style.width='40px'; td.style.minWidth='40px';
+    const c=counts[idx];
+    if(c>0){ const r=c/maxC; td.style.background='rgba(200,16,46,'+(0.12+0.78*r).toFixed(2)+')'; if(r>=0.55) td.style.color='#fff'; td.textContent=c; }
+    trS.appendChild(td);
+  });
+  t.appendChild(trS);
+  outer.appendChild(t);
+  const outerBox=document.createElement('div'); outerBox.className='listOuter';
+  const fL=document.createElement('div'); fL.className='listFade l';
+  const fR=document.createElement('div'); fR.className='listFade r';
+  outerBox.appendChild(outer); outerBox.appendChild(fL); outerBox.appendChild(fR);
+  lv.appendChild(outerBox);
+  const updF=()=>{ const max=outer.scrollWidth-outer.clientWidth;
+    fR.style.opacity=(max>2 && outer.scrollLeft<max-2)?'1':'0';
+    fL.style.opacity=(outer.scrollLeft>2)?'1':'0'; };
+  outer.addEventListener('scroll',updF,{passive:true});
+  requestAnimationFrame(updF);
+}
+function renderList(){
+  const lv=document.getElementById('listView');
+  const names=[...others.keys()];
+  lv.innerHTML='';
+  if(!names.length){ lv.innerHTML='<p style="text-align:center;color:#64748b;font-size:13px;margin:22px 0">まだ回答がありません。</p>'; return; }
+  const noted=names.filter(n=>(notes.get(n)||'').trim());
+  if(noted.length){
+    const box=document.createElement('div'); box.style.cssText='margin:10px 0 2px;font-size:12.5px;line-height:1.9';
+    const hd=document.createElement('div'); hd.style.cssText='font-weight:700;color:#64748b;font-size:12px'; hd.textContent='💬 一言'; box.appendChild(hd);
+    noted.forEach(n=>{
+      const line=document.createElement('div');
+      const b=document.createElement('b'); b.textContent=n; line.appendChild(b);
+      line.appendChild(document.createTextNode('：'+notes.get(n)));
+      box.appendChild(line);
+    });
+    lv.appendChild(box);
+  }
+  if(evKind==='date'){ renderDateListTables(lv, names); return; }
+  days.forEach(ds=>{
+    const daySlots=slots.filter(m=>{ const key=ds+'|'+(m/SLOT); return !effAllowed || effAllowed.has(key); });
+    if(!daySlots.length) return;
+    const h=document.createElement('h3'); h.style.cssText='margin:16px 0 6px;font-size:14.5px';
+    h.textContent=dayLabel(ds); lv.appendChild(h);
+    const outer=document.createElement('div'); outer.className='listWrap';
+    const t=document.createElement('table'); t.className='listTable';
+    const hr=document.createElement('tr');
+    const th0=document.createElement('th'); th0.className='nameH'; hr.appendChild(th0);
+    daySlots.forEach((m,idx)=>{ const th=document.createElement('th'); th.className='time'+(m%60===0?' hourL':'');
+      if(m%60===0){ const sp=document.createElement('span'); sp.className='tick'; sp.textContent=fmt(m); th.appendChild(sp); }
+      if(idx===daySlots.length-1 && (m+SLOT)%60===0){
+        const sp2=document.createElement('span'); sp2.className='tick';
+        sp2.style.left='100%'; sp2.textContent=fmt(m+SLOT); th.appendChild(sp2);
+      }
+      hr.appendChild(th); });
+    t.appendChild(hr);
+    // ○の合計行のための全体最大値（この日の表の中で計算）
+    const counts=daySlots.map(m=>{
+      let c=0; const key=ds+'|'+(m/SLOT);
+      names.forEach(n=>{ if((others.get(n)||{})[key]===1) c++; });
+      return c;
+    });
+    names.forEach(n=>{
+      const tr=document.createElement('tr');
+      const td0=document.createElement('td'); td0.className='name';
+      td0.title='押すとこの回答を編集できます';
+      td0.addEventListener('click',()=>startEdit(n));
+      const inw=document.createElement('div'); inw.className='nameCellIn';
+      const nsp=document.createElement('span'); nsp.className='nameTxt'; nsp.textContent=n;
+      inw.appendChild(nsp);
+      if(isAdmin){
+        const dbtn=document.createElement('button'); dbtn.className='danger pdel'; dbtn.textContent='×';
+        dbtn.title=n+' の回答を削除';
+        dbtn.addEventListener('click',async(e)=>{ e.stopPropagation(); await adminDeleteParticipant(n); });
+        inw.appendChild(dbtn);
+      }
+      td0.appendChild(inw);
+      tr.appendChild(td0);
+      const marks=others.get(n)||{};
+      daySlots.forEach(m=>{
+        const v=marks[ds+'|'+(m/SLOT)];
+        const td=document.createElement('td');
+        td.className='sym '+((v===1)?'o':(v===0.5)?'t':'x')+(m%60===0?' hourL':'');
+        td.innerHTML=(v===1)?SVG_O:(v===0.5)?SVG_T:SVG_X;
+        tr.appendChild(td);
+      });
+      t.appendChild(tr);
+    });
+    // 一番下に ○ の合計行
+    const maxC=Math.max(1,...counts);
+    const trS=document.createElement('tr');
+    const tdS0=document.createElement('td'); tdS0.className='sumName'; tdS0.innerHTML=SVG_O.replace('cell-ic','sum-ic')+'の数'; trS.appendChild(tdS0);
+    daySlots.forEach((m,idx)=>{
+      const td=document.createElement('td'); td.className='sum'+(m%60===0?' hourL':'');
+      const c=counts[idx];
+      if(c>0){
+        const r=c/maxC;
+        td.style.background='rgba(200,16,46,'+(0.12+0.78*r).toFixed(2)+')';
+        if(r>=0.55) td.style.color='#fff';
+        td.textContent=c;
+      } else td.textContent='';
+      trS.appendChild(td);
+    });
+    t.appendChild(trS);
+    outer.appendChild(t);
+    const outerBox=document.createElement('div'); outerBox.className='listOuter';
+    const fL=document.createElement('div'); fL.className='listFade l';
+    const fR=document.createElement('div'); fR.className='listFade r';
+    outerBox.appendChild(outer); outerBox.appendChild(fL); outerBox.appendChild(fR);
+    lv.appendChild(outerBox);
+    const updF=()=>{ const max=outer.scrollWidth-outer.clientWidth;
+      fR.style.opacity=(max>2 && outer.scrollLeft<max-2)?'1':'0';
+      fL.style.opacity=(outer.scrollLeft>2)?'1':'0'; };
+    outer.addEventListener('scroll',updF,{passive:true});
+    requestAnimationFrame(updF);
+  });
+}
+document.getElementById('clearBtn').addEventListener('click',()=>{ mine.clear(); render(); markDirty(); });
+const fadeL=document.getElementById('fadeL'), fadeR=document.getElementById('fadeR'), scrollHint=document.getElementById('scrollHint');
+function updateFades(){
+  const max=wrap.scrollWidth-wrap.clientWidth;
+  fadeL.style.opacity=wrap.scrollLeft>4?1:0;
+  fadeR.style.opacity=(max-wrap.scrollLeft)>4?1:0;
+}
+wrap.addEventListener('scroll',updateFades,{passive:true});
+window.addEventListener('resize',updateFades);
+document.getElementById('copyAdminBtn').addEventListener('click',async()=>{
+  const msg=document.getElementById('adminMsg');
+  try{ await navigator.clipboard.writeText(location.href); msg.textContent='管理ページのURLをコピーしました'; }
+  catch(e){ prompt('管理ページのURL',location.href); }
+  setTimeout(()=>msg.textContent='',3000);
+});
+document.getElementById('shareBtn').addEventListener('click',async()=>{
+  const url=location.origin+'/e/'+eventId;
+  const msg=document.getElementById('shareMsg');
+  try{ await navigator.clipboard.writeText(url); msg.textContent='参加者用URLをコピーしました'; }
+  catch(e){ prompt('参加者用URL',url); }
+  setTimeout(()=>msg.textContent='',3000);
+});
+document.getElementById('deleteMineBtn').addEventListener('click',async()=>{
+  const target=editingName;
+  if(!target) return;
+  if(!confirm('あなたの回答「'+target+'」を削除しますか？')) return;
+  const r=await fetch('/api/events/'+eventId+'/participant/self-delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:target})});
+  if(r.ok){
+    others.delete(target); notes.delete(target);
+    if(localStorage.getItem('nurie-name')===target) localStorage.removeItem('nurie-name');
+    if(localStorage.getItem('tonton-name')===target) localStorage.removeItem('tonton-name');
+    editingName=null; mine=new Map(); nameEl.value='';
+    document.getElementById('deleteMineBtn').style.display='none';
+    renderPlist(); setView('list'); alert('回答を削除しました');
+  } else alert('削除に失敗しました');
+});
+async function adminDeleteParticipant(n){
+  if(!isAdmin) return;
+  if(!confirm('参加者「'+n+'」の回答を削除しますか？')) return;
+  const r=await fetch('/api/events/'+eventId+'/participant/admin-delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,adminKey})});
+  if(r.ok){ others.delete(n); notes.delete(n); renderPlist(); renderList(); }
+  else alert('参加者の削除に失敗しました');
+}
+document.getElementById('csvBtn').addEventListener('click',async()=>{
+  const r=await fetch('/api/events/'+eventId+'/export.csv',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminKey})});
+  if(!r.ok){ alert('ダウンロードに失敗しました'); return; }
+  const blob=await r.blob();
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='nurie-'+eventId+'.csv'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+});
+const delBtn=document.getElementById('delBtn');
+if(delBtn) delBtn.addEventListener('click',async()=>{
+  if(!confirm('この調整表を削除しますか？')) return;
+  const r=await fetch('/api/events/'+eventId+'/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({adminKey})});
+  if(r.ok){ alert('削除しました'); location.href='/'; } else alert('削除に失敗しました');
+});
+// 隠し機能：タイトルを5回タップでドット絵出力ボタンを表示
+let titleTaps=0, tapTimer=null;
+document.getElementById('title').addEventListener('click',()=>{
+  titleTaps++;
+  clearTimeout(tapTimer); tapTimer=setTimeout(()=>titleTaps=0,1200);
+  if(titleTaps>=5){ if(evKind!=='date') document.getElementById('dotBtn').style.display=''; titleTaps=0; }
+});
+document.getElementById('dotBtn').addEventListener('click',()=>{
+  const cell=16;
+  const cv=document.createElement('canvas');
+  cv.width=slots.length*cell; cv.height=days.length*cell;
+  const ctx=cv.getContext('2d');
+  days.forEach((ds,r)=>{
+    slots.forEach((m,c)=>{
+      const v=mine.get(ds+'|'+(m/SLOT));
+      ctx.fillStyle=(v===1)?'#c8102e':(v===0.5)?'#f3a7b1':'#f4f4f5';
+      ctx.fillRect(c*cell,r*cell,cell,cell);
+    });
+  });
+  const a=document.createElement('a');
+  a.download='nurie-dot.png'; a.href=cv.toDataURL('image/png'); a.click();
+});
+// ダークモード切替
+const themeBtn=document.getElementById('themeBtn');
+function applyTheme(){
+  const t=(localStorage.getItem('nurie-theme')||localStorage.getItem('tonton-theme'));
+  if(t){ document.body.dataset.theme=t; } else { delete document.body.dataset.theme; }
+  const dark=t? (t==='dark') : matchMedia('(prefers-color-scheme: dark)').matches;
+  themeBtn.textContent=dark?'☀️':'🌙';
+}
+themeBtn.addEventListener('click',()=>{
+  const darkNow=document.body.dataset.theme? (document.body.dataset.theme==='dark') : matchMedia('(prefers-color-scheme: dark)').matches;
+  localStorage.setItem('nurie-theme', darkNow?'light':'dark');
+  applyTheme();
+});
+applyTheme();
+load();
+</script>
+<div style="text-align:center;font-size:12px;color:#94a3b8;margin:26px 0 8px"><a href="/privacy" style="color:inherit">プライバシーポリシー</a>｜<a href="/terms" style="color:inherit">利用規約</a>｜<a href="https://forms.gle/SVbQobSbyKk2UpJQ6" target="_blank" rel="noopener" style="color:inherit">お問い合わせ</a>｜<a href="https://github.com/iwanaminami/nurie" target="_blank" rel="noopener" style="color:inherit">GitHub</a></div>
+</body>
+</html>
