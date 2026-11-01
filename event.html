@@ -820,8 +820,9 @@ wrap.addEventListener('scroll',updateFades,{passive:true});
 window.addEventListener('resize',updateFades);
 document.getElementById('copyAdminBtn').addEventListener('click',async()=>{
   const msg=document.getElementById('adminMsg');
-  try{ await navigator.clipboard.writeText(location.href); msg.textContent='管理ページのURLをコピーしました'; }
-  catch(e){ prompt('管理ページのURL',location.href); }
+  const adminUrl=location.origin+location.pathname+'?admin='+adminKey;
+  try{ await navigator.clipboard.writeText(adminUrl); msg.textContent='管理ページのURLをコピーしました'; }
+  catch(e){ prompt('管理ページのURL',adminUrl); }
   setTimeout(()=>msg.textContent='',3000);
 });
 document.getElementById('shareBtn').addEventListener('click',async()=>{
