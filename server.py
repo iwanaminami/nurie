@@ -429,7 +429,7 @@ a.btn{display:inline-block;margin-top:16px;background:#c8102e;color:#fff;text-de
 def _legal(title, body):
     return LEGAL_TEMPLATE.replace("{title}", title).replace("{body}", body)
 
-LEGAL_TEMPLATE = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}｜nurie</title>\n<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27%23c8102e%27%2F%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2714%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%277%27%2F%3E%3C%2Fsvg%3E">\n<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">\n<style>body{font-family:"Google Sans","Noto Sans JP",system-ui,sans-serif;margin:24px auto;padding:0 16px;max-width:760px;color:#1e293b;background:#f6f8fc;line-height:1.8}\nh1{text-align:center;font-size:20px} h2{font-size:15.5px;margin-top:26px}\np,li{font-size:14px} .box{background:#fff;border:1px solid #e3e3e3;border-radius:12px;padding:20px 26px 26px}\nfooter{text-align:center;font-size:12.5px;color:#64748b;margin:22px 0} a{color:#a50d26}\n@media (prefers-color-scheme:dark){body{background:#101216;color:#e8eaee} .box{background:#15181e;border-color:#262c38} a{color:#f3a7b1}}\n</style></head><body>\n<style>.logoD{display:none}@media (prefers-color-scheme:dark){.logoL{display:none!important}.logoD{display:inline!important}}body[data-theme="dark"] .logoL{display:none!important}body[data-theme="dark"] .logoD{display:inline!important}body[data-theme="light"] .logoL{display:inline!important}body[data-theme="light"] .logoD{display:none!important}</style><div style="text-align:center;margin:0 0 10px"><a href="/" style="text-decoration:none;display:inline-block"><img class="logoL" src="/logo.png" alt="nurie" style="height:30px;vertical-align:middle"><img class="logoD" src="/logo-dark.png" alt="nurie" style="height:30px;vertical-align:middle;display:none"></a></div>\n<div class="box"><h1>{title}</h1>\n{body}\n</div>\n<footer><a href="/">トップへ戻る</a>｜<a href="/privacy">プライバシーポリシー</a>｜<a href="/terms">利用規約</a>｜<a href="https://forms.gle/SVbQobSbyKk2UpJQ6" target="_blank" rel="noopener">お問い合わせ</a>｜<a href="https://github.com/nurie-nuru/nurie" target="_blank" rel="noopener">GitHub</a></footer>\n</body></html>'
+LEGAL_TEMPLATE = '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>{title}｜nurie</title>\n<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2064%2064%27%3E%3Crect%20width%3D%2764%27%20height%3D%2764%27%20rx%3D%2714%27%20fill%3D%27%23c8102e%27%2F%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%2732%27%20r%3D%2714%27%20fill%3D%27none%27%20stroke%3D%27%23fff%27%20stroke-width%3D%277%27%2F%3E%3C%2Fsvg%3E">\n<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">\n<style>body{font-family:"Google Sans","Noto Sans JP",system-ui,sans-serif;margin:24px auto;padding:0 16px;max-width:760px;color:#1e293b;background:#f6f8fc;line-height:1.8}\nh1{text-align:center;font-size:20px} h2{font-size:15.5px;margin-top:26px}\np,li{font-size:14px} .box{background:#fff;border:1px solid #e3e3e3;border-radius:12px;padding:20px 26px 26px}\nfooter{text-align:center;font-size:12.5px;color:#64748b;margin:22px 0} a{color:#a50d26}\n@media (prefers-color-scheme:dark){body{background:#101216;color:#e8eaee} .box{background:#15181e;border-color:#262c38} a{color:#f3a7b1}}\n</style></head><body>\n<style>.logoD{display:none}@media (prefers-color-scheme:dark){.logoL{display:none!important}.logoD{display:inline!important}}body[data-theme="dark"] .logoL{display:none!important}body[data-theme="dark"] .logoD{display:inline!important}body[data-theme="light"] .logoL{display:inline!important}body[data-theme="light"] .logoD{display:none!important}</style><div style="text-align:center;margin:0 0 10px"><a href="/" style="text-decoration:none;display:inline-block"><img class="logoL" src="/logo.png" alt="nurie" style="height:30px;vertical-align:middle"><img class="logoD" src="/logo-dark.png" alt="nurie" style="height:30px;vertical-align:middle;display:none"></a></div>\n<div class="box"><h1>{title}</h1>\n{body}\n</div>\n<footer><a href="/">トップへ戻る</a>｜<a href="/privacy">プライバシーポリシー</a>｜<a href="/terms">利用規約</a>｜<a href="https://forms.gle/SVbQobSbyKk2UpJQ6" target="_blank" rel="noopener">お問い合わせ</a>｜<a href="https://github.com/nurie-nuru/nurie" target="_blank" rel="noopener">GitHub</a></footer>\n</body></html>'
 
 PRIVACY_PAGE = _legal("プライバシーポリシー", '\n<h2>取得する情報</h2>\n<p>本サービスでは、日程調整のために以下の情報を取得・保存します。</p>\n<ul>\n<li>調整表のタイトル、候補日、選択可能な時間帯</li>\n<li>参加者の名前、各時間帯への回答（空き状況）、任意の一言コメント</li>\n<li>調整表の作成日時</li>\n</ul>\n<p>アカウント登録は不要で、メールアドレス等の連絡先は取得しません。参加者の名前とテーマ設定（ダークモード等）の保持のために、お使いのブラウザのローカルストレージを使用します。</p>\n<h2>利用目的</h2>\n<p>取得した情報は、日程調整表の表示・集計のためにのみ使用します。</p>\n<h2>保存期間</h2>\n<p>調整表は作成から30日で自動的に削除されます。主催者は管理用URLからいつでも削除できます。</p>\n<h2>運営者によるアクセスについて</h2>\n<p>本サービスのデータは暗号化されておらず、サービス運営者は保守・運用のために保存されたデータ（タイトル、名前、回答内容）を閲覧できる状態にあります。機密性の高い内容の入力はお控えください。</p>\n<h2>第三者提供</h2>\n<p>法令に基づく場合を除き、取得した情報を第三者に提供しません。</p>\n<h2>アクセス解析・広告</h2>\n<p>本サービスでは、アクセス解析ツールおよび広告配信を利用していません（導入する場合は本ポリシーを改定します）。</p>\n<h2>お問い合わせ</h2>\n<p>本ポリシーに関するお問い合わせは、<a href="https://forms.gle/SVbQobSbyKk2UpJQ6" target="_blank" rel="noopener">お問い合わせフォーム</a>からご連絡ください。</p>\n')
 TERMS_PAGE = _legal("利用規約", '\n<h2>サービス内容</h2>\n<p>nurie は、候補日と空き時間を塗る形式で日程調整を行う無料のウェブサービスです。調整表は作成から30日間保存され、期間を過ぎると自動的に削除されます。</p>\n<h2>管理用URLについて</h2>\n<p>調整表を作成すると、削除等ができる管理用URLが発行されます。管理用URLを知る人は主催者とみなされます。URLの管理はご自身の責任で行ってください。</p>\n<h2>禁止事項</h2>\n<ul>\n<li>法令または公序良俗に反する内容の入力</li>\n<li>他の利用者や第三者へのなりすまし、誹謗中傷</li>\n<li>サービスの運営を妨げる行為（過剰な自動アクセス、脆弱性の悪用等）</li>\n<li>スパム目的での大量作成</li>\n</ul>\n<h2>免責</h2>\n<p>本サービスは現状のまま提供されます。データの消失、サービスの中断・終了、その他本サービスの利用により生じた損害について、運営者は、運営者の故意または重大な過失による場合および法令により免責が認められない場合を除き、責任を負いません。本サービスのデータは暗号化されておらず、第三者に閲覧される可能性を完全には排除できないため、機密性の高い内容の入力はお控えください。重要な日程の調整では、確定した日時を別途控えておくことをおすすめします。</p>\n<h2>規約の変更</h2>\n<p>運営者は、必要に応じて本規約を変更できます。変更後の規約は、本ページに掲載した時点で効力を生じます。</p>\n<h2>お問い合わせ</h2>\n<p>本サービスに関するお問い合わせは、<a href="https://forms.gle/SVbQobSbyKk2UpJQ6" target="_blank" rel="noopener">お問い合わせフォーム</a>からご連絡ください。</p>\n')
@@ -486,10 +486,12 @@ class H(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers(); self.wfile.write(body)
-    def send_html(self, code, html):
+    def send_html(self, code, html, noindex=False):
         body = html.encode()
         self.send_response(code)
         self._sec()
+        if noindex:
+            self.send_header("X-Robots-Tag", "noindex")
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers(); self.wfile.write(body)
@@ -507,21 +509,21 @@ class H(BaseHTTPRequestHandler):
         p = urlparse(self.path)
         if p.path == "/":
             return self.send_html(200, CREATE_PAGE)
-        if p.path == "/privacy": return self.send_html(200, PRIVACY_PAGE)
-        if p.path == "/terms": return self.send_html(200, TERMS_PAGE)
+        if p.path == "/privacy": return self.send_html(200, PRIVACY_PAGE, noindex=True)
+        if p.path == "/terms": return self.send_html(200, TERMS_PAGE, noindex=True)
         if p.path in ("/ogp.png", "/apple-touch-icon.png", "/logo.png", "/logo-dark.png"):
             fname = p.path.lstrip("/")
             try:
                 data = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), fname), "rb").read()
                 self.send_response(200); self._sec(); self.send_header("Content-Type", "image/png")
                 self.send_header("Content-Length", str(len(data))); self.end_headers(); self.wfile.write(data); return
-            except OSError: return self.send_html(404, NOT_FOUND_PAGE)
+            except OSError: return self.send_html(404, NOT_FOUND_PAGE, noindex=True)
         m = re.fullmatch(r"/e/([A-Za-z0-9_-]{8,32})", p.path)
         if m:
             con = db()
             if not con.execute("SELECT 1 FROM events WHERE id=?", (m.group(1),)).fetchone():
-                return self.send_html(404, NOT_FOUND_PAGE)
-            return self.send_html(200, EVENT_PAGE)
+                return self.send_html(404, NOT_FOUND_PAGE, noindex=True)
+            return self.send_html(200, EVENT_PAGE, noindex=True)
         m = re.fullmatch(r"/api/events/([A-Za-z0-9_-]{8,32})", p.path)
         if m:
             cleanup_expired()
@@ -538,7 +540,7 @@ class H(BaseHTTPRequestHandler):
                 "allowed": json.loads(ev[4]) if ev[4] else None,
                 "expiresAt": expires_str,
                 "participants": [{"name": n, "marks": json.loads(mk), "note": nt or ""} for n, mk, nt in rows]})
-        return self.send_html(404, NOT_FOUND_PAGE)
+        return self.send_html(404, NOT_FOUND_PAGE, noindex=True)
 
     def do_POST(self):
         p = urlparse(self.path)
